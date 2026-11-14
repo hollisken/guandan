@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>掼蛋训练所 · 教学型AI对局</title>
+<link rel="stylesheet" href="css/style.css?v=7">
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <span class="logo">掼蛋训练所</span>
+    <div class="tabs">
+      <button data-view="play" class="on">对局(带教练)</button>
+      <button data-view="quiz">记牌训练</button>
+      <button data-view="drill">出牌习题</button>
+      <button data-view="compose">组牌训练</button>
+      <button data-view="residue">精讲残局</button>
+      <button data-view="lesson">课程</button>
+    </div>
+    <div class="right">
+      <span id="levelinfo" class="levelinfo"></span>
+      <label>AI难度
+        <select id="diffSel">
+          <option value="easy">入门</option>
+          <option value="medium" selected>进阶</option>
+          <option value="hard">高手</option>
+        </select>
+      </label>
+      <label>速度
+        <select id="speedSel">
+          <option value="900">慢</option>
+          <option value="500" selected>中</option>
+          <option value="180">快</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="coachToggle" checked> 教练提示</label>
+      <button class="btn" id="btnNew">新比赛</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="stage">
+      <!-- ===== 对局 ===== -->
+      <div class="view on" id="view-play">
+        <div id="table">
+          <div id="centerinfo">
+            <div class="lv" id="lvText">打 2</div>
+            <div class="sub" id="lvSub">第 1 局 · 你与对家一队</div>
+          </div>
+          <div class="seat" id="seat3"><div class="name"><b>上家 西</b><span class="cnt"></span><span class="badge">报单!</span></div><div class="fan"></div></div>
+          <div class="seat" id="seat2"><div class="name"><b>对家 北 · 同伴</b><span class="cnt"></span><span class="badge">报单!</span></div><div class="fan"></div></div>
+          <div class="seat" id="seat1"><div class="name"><b>下家 东</b><span class="cnt"></span><span class="badge">报单!</span></div><div class="fan"></div></div>
+          <div class="seat" id="seat0"><div class="name"><b>你 南</b><span class="cnt"></span><span class="badge">报牌</span></div></div>
+          <div class="trickzone">
+            <div class="played" id="played3"></div>
+            <div class="played" id="played2"></div>
+            <div class="played" id="played1"></div>
+            <div class="played" id="played0"></div>
+          </div>
+          <div id="turnArrow"></div>
+          <div id="actions">
+            <button id="btnPlay">出 牌</button>
+            <button id="btnPass">不 要</button>
+            <button id="btnHint">💡 提示</button>
+          </div>
+          <div class="seat" id="seat0hand"><div class="handrow" id="myHand"></div></div>
+        </div>
+      </div>
+
+      <!-- ===== 记牌训练 ===== -->
+      <div class="view" id="view-quiz">
+        <div class="pagepad">
+          <div class="quizhead">
+            <b>记牌训练</b><span class="mini">对局进行到某一刻, 考你"场上还剩什么牌"—— 这是判断同伴与对手剩牌的基本功</span>
+            <span class="score" id="quizScore">0 / 0</span>
+            <button class="btn gray" id="btnQuizNew">换一组</button>
+          </div>
+          <div id="quizArea"></div>
+        </div>
+      </div>
+
+      <!-- ===== 出牌习题 ===== -->
+      <div class="view" id="view-drill">
+        <div class="pagepad">
+          <div class="quizhead">
+            <b>出牌习题</b><span class="mini">随机局面选最佳出牌, AI给出评分理由</span>
+            <button class="btn gray" id="btnDrillNew">换一题</button>
+          </div>
+          <div id="drillArea"></div>
+        </div>
+      </div>
+
+      <!-- ===== 组牌训练 ===== -->
+      <div class="view" id="view-compose">
+        <div class="pagepad">
+          <div class="quizhead">
+            <b>组牌训练</b><span class="mini">把手牌拆成尽量少的手数——选中若干张点"组成一手"；组完或随时点"对照AI拆牌"</span>
+            <button class="btn" id="btnComposeGroup">✔ 组成一手</button>
+            <button class="btn gray" id="btnComposeUndo">撤销</button>
+            <button class="btn gray" id="btnComposeCompare">对照AI拆牌</button>
+            <button class="btn gray" id="btnComposeNew">换一手</button>
+          </div>
+          <div id="composeArea"></div>
+        </div>
+      </div>
+
+      <!-- ===== 精讲残局 ===== -->
+      <div class="view" id="view-residue">
+        <div class="pagepad" id="residueArea"></div>
+      </div>
+
+      <!-- ===== 课程 ===== -->
+      <div class="view" id="view-lesson">
+        <div class="pagepad" id="lessonArea"></div>
+      </div>
+    </div>
+
+    <!-- ===== 侧栏(仅对局视图) ===== -->
+    <div id="sidebar">
+      <div class="sidebox">
+        <h3>记牌器 <span class="mini" id="recSub">未现牌 = 108 − 你的手牌 − 已出牌</span></h3>
+        <div id="recorder"></div>
+      </div>
+      <div class="sidebox">
+        <h3>局势 <span class="mini">剩牌 / 报牌 / 记忆要点</span></h3>
+        <div id="sitch"></div>
+      </div>
+      <div class="sidebox" style="flex:1; display:flex; flex-direction:column; min-height:0;">
+        <h3>教练面板</h3>
+        <div id="coachBox"></div>
+      </div>
+      <div class="sidebox">
+        <h3>牌局记录</h3>
+        <div id="logBox"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 结算弹层 -->
+<div class="overlay" id="ovHandEnd">
+  <div class="panel">
+    <h2 id="heTitle">本局结束</h2>
+    <div class="big" id="heBody"></div>
+    <div id="heReplay"></div>
+    <div class="btnrow">
+      <button class="btn" id="btnNextHand">下一局</button>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="ovTribute">
+  <div class="panel">
+    <h2>还贡</h2>
+    <div class="big">你收了对方的进贡, 请选<b>任意一张</b>牌还给对方。按《掼蛋竞赛规则》: 还给对方的牌可任意, 习惯上还<b>小牌</b>（建议: 还最小且不成对的散牌）。</div>
+    <div style="margin-top:12px" class="handrow" id="tributeCards"></div>
+  </div>
+</div>
+<div class="overlay" id="ovMatchEnd">
+  <div class="panel">
+    <h2 id="meTitle">比赛结束</h2>
+    <div class="big" id="meBody"></div>
+    <div class="btnrow"><button class="btn" id="btnRematch">再来一场</button></div>
+  </div>
+</div>
+
+<script src="js/engine.js?v=7"></script>
+<script src="js/ai.js?v=7"></script>
+<script src="js/trainer.js?v=7"></script>
+<script src="js/lessons.js?v=7"></script>
+<script src="js/ui.js?v=7"></script>
+</body>
+</html>
